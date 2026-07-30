@@ -1,46 +1,92 @@
-# [수의정보학] 소동물·가축·야생동물 통합 PoCT 전해질 진단 알고리즘
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수의 임상 및 야생동물 PoCT 전해질 진단 시스템</title>
+    <style>
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .card { max-width: 500px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; font-size: 20px; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        select, input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
+        button { background-color: #27ae60; color: white; font-weight: bold; border: none; margin-top: 20px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🩺 수의정보학 PoCT 전해질 진단기</h2>
+        
+        <label for="species">1. 진단 대상 동물 선택</label>
+        <select id="species">
+            <option value="1">🐶 개 (Canine)</option>
+            <option value="2">🐱 고양이 (Feline)</option>
+            <option value="3">🐮 소/송아지 (Bovine)</option>
+            <option value="4">🐯 호랑이/사자 (Panthera)</option>
+            <option value="5">🐵 침팬지 (Chimpanzee)</option>
+            <option value="6">🐘 코끼리 (Elephant)</option>
+            <option value="7">🦒 기린 (Giraffe)</option>
+            <option value="8">🦜 앵무새 (Psittacine)</option>
+            <option value="9">🐢 바다거북 (Sea Turtle)</option>
+            <option value="10">🐬 남방큰돌고래 (Dolphin)</option>
+        </select>
 
-SPECIES_MASTER_DATABASE = {
-    "1": {"name": "개 (Canine)", "min": 3.5, "max": 5.5, "note": "수액 처치 및 심장 질환 환자 모니터링"},
-    "2": {"name": "고양이 (Feline)", "min": 3.5, "max": 5.8, "note": "FLUTD 요도 폐색 관련 고칼륨혈증 심정지 주의"},
-    "3": {"name": "소/송아지 (Bovine)", "min": 3.9, "max": 5.3, "note": "설사성 탈수 및 대사성 산증 교정 필요"},
-    "4": {"name": "호랑이/사자 (Panthera)", "min": 3.8, "max": 5.2, "note": "마취 중 대사성 산증 및 고칼륨혈증 주의"},
-    "5": {"name": "침팬지 (Chimpanzee)", "min": 3.5, "max": 5.1, "note": "스트레스성 탈수 및 심장 질환 모니터링"},
-    "6": {"name": "코끼리 (Elephant)", "min": 3.6, "max": 5.0, "note": "거대 체구 체액 불균형 및 정밀 수액 교정"},
-    "7": {"name": "기린 (Giraffe)", "min": 3.7, "max": 5.3, "note": "포획 근육 손상(Capture Myopathy) 위험"},
-    "8": {"name": "앵무새 (Psittacine)", "min": 3.0, "max": 4.5, "note": "조류 특이적 저칼륨 생리 참고치 적용"},
-    "9": {"name": "바다거북 (Sea Turtle)", "min": 2.5, "max": 4.0, "note": "파충류 특이적 삼투압 및 염분 조절 이상"},
-    "10": {"name": "남방큰돌고래 (Dolphin)", "min": 3.3, "max": 4.7, "note": "해양 포유류 탈수 및 신장 기능 모니터링"}
-}
+        <label for="voltage">2. Pasco 전압 센서 실측값 (mV)</label>
+        <input type="number" id="voltage" placeholder="예: 135" value="135">
 
-def run_comprehensive_poct_diagnosis(choice_id, voltage_mV):
-    if choice_id not in SPECIES_MASTER_DATABASE:
-        print("❌ 올바른 번호를 선택해주세요.")
-        return
+        <button onclick="diagnose()">진단하기</button>
 
-    target = SPECIES_MASTER_DATABASE[choice_id]
-    
-    # Pasco 전압 센서 수치(mV) -> 네른스트 방정식 기반 이온 농도(mEq/L) 환산
-    potassium_conc = round(3.5 + (voltage_mV / 100.0) * 2.0, 2)
-    
-    print(f"\n==================================================")
-    print(f"🩺 [전통 임상 & 야생동물 수의정보학 PoCT] 대상: {target['name']}")
-    print(f"📥 Pasco 센서 실측 전위차: {voltage_mV} mV")
-    print(f"🧪 네른스트 환산 칼륨 농도: {potassium_conc} mEq/L")
-    print(f"📊 종별 정상 생리 참고치: {target['min']} ~ {target['max']} mEq/L")
-    print(f"--------------------------------------------------")
-    
-    if potassium_conc < target['min']:
-        print(f"⚠️ [저칼륨혈증 경고] {target['name']}의 근육 약화 및 기력 저하 주의")
-    elif target['min'] <= potassium_conc <= target['max']:
-        print(f"✅ [정상] {target['name']}의 전해질 평형 상태가 안정적입니다.")
-    else:
-        print(f"🚨 [고칼륨혈증 응급!] {target['note']}! 즉시 처치 필요")
-    print(f"==================================================\n")
+        <div id="result"></div>
+    </div>
 
-# --- 테스트 실행 예시 ---
-# 2번 고양이 선택 / Pasco 전압 135 mV 가정
-run_comprehensive_poct_diagnosis("2", 135)
+    <script>
+        const db = {
+            "1": { name: "개 (Canine)", min: 3.5, max: 5.5, note: "수액 처치 및 심장 질환 환자 모니터링" },
+            "2": { name: "고양이 (Feline)", min: 3.5, max: 5.8, note: "FLUTD 요도 폐색 관련 고칼륨혈증 심정지 주의" },
+            "3": { name: "소/송아지 (Bovine)", min: 3.9, max: 5.3, note: "설사성 탈수 및 대사성 산증 교정 필요" },
+            "4": { name: "호랑이/사자 (Panthera)", min: 3.8, max: 5.2, note: "마취 중 대사성 산증 및 고칼륨혈증 주의" },
+            "5": { name: "침팬지 (Chimpanzee)", min: 3.5, max: 5.1, note: "스트레스성 탈수 및 심장 질환 모니터링" },
+            "6": { name: "코끼리 (Elephant)", min: 3.6, max: 5.0, note: "거대 체구 체액 불균형 및 정밀 수액 교정" },
+            "7": { name: "기린 (Giraffe)", min: 3.7, max: 5.3, note: "포획 근육 손상(Capture Myopathy) 위험" },
+            "8": { name: "앵무새 (Psittacine)", min: 3.0, max: 4.5, note: "조류 특이적 저칼륨 생리 참고치 적용" },
+            "9": { name: "바다거북 (Sea Turtle)", min: 2.5, max: 4.0, note: "파충류 특이적 삼투압 및 염분 조절 이상" },
+            "10": { name: "남방큰돌고래 (Dolphin)", min: 3.3, max: 4.7, note: "해양 포유류 탈수 및 신장 기능 모니터링" }
+        };
 
-# 4번 호랑이 선택 / Pasco 전압 140 mV 가정
-run_comprehensive_poct_diagnosis("4", 140)
+        function diagnose() {
+            const speciesId = document.getElementById("species").value;
+            const voltage = parseFloat(document.getElementById("voltage").value);
+            const target = db[speciesId];
+
+            if (isNaN(voltage)) {
+                alert("올바른 전압 수치를 입력해주세요!");
+                return;
+            }
+
+            const conc = (3.5 + (voltage / 100.0) * 2.0).toFixed(2);
+            const resultDiv = document.getElementById("result");
+            resultDiv.style.display = "block";
+
+            let msg = `<b>[진단 대상]</b>: ${target.name}<br>`;
+            msg += `<b>[네른스트 환산 칼륨]</b>: ${conc} mEq/L (정상 참고치: ${target.min}~${target.max})<br><hr style="border:0; border-top:1px solid #ccc; margin:10px 0;">`;
+
+            if (conc < target.min) {
+                resultDiv.style.backgroundColor = "#fff3cd";
+                resultDiv.style.border = "1px solid #ffeeba";
+                msg += `⚠️ <b>[저칼륨혈증 경고]</b> 근육 약화 및 기력 저하 주의!`;
+            } else if (conc >= target.min && conc <= target.max) {
+                resultDiv.style.backgroundColor = "#d4edda";
+                resultDiv.style.border = "1px solid #c3e6cb";
+                msg += `✅ <b>[정상]</b> 전해질 평형 상태가 안정적입니다.`;
+            } else {
+                resultDiv.style.backgroundColor = "#f8d7da";
+                resultDiv.style.border = "1px solid #f5c6cb";
+                msg += `🚨 <b>[고칼륨혈증 응급!]</b> ${target.note}! 즉시 처치 필요.`;
+            }
+
+            resultDiv.innerHTML = msg;
+        }
+    </script>
+</body>
+</html>
